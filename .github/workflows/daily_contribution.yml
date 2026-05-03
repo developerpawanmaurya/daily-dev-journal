@@ -1,0 +1,36 @@
+name: Daily Contribution
+
+on:
+  schedule:
+    # Runs every day at 9:00 AM IST (3:30 AM UTC)
+    - cron: '30 3 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  daily-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run daily update script
+        run: python scripts/update_log.py
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "developerpawanmaurya@gmail.com"
+          git config --global user.name "Pawan Maurya"
+
+      - name: Commit and push changes
+        run: |
+          git add .
+          git commit -m "🌱 Daily contribution - $(date +'%Y-%m-%d')"
+          git push
