@@ -4,6 +4,7 @@ Appends a meaningful daily entry (with a random motivational quote)
 to contributions/daily_log.md — keeping the GitHub streak alive!
 """
 
+import os
 import random
 from datetime import datetime, timezone, timedelta
 
@@ -24,7 +25,7 @@ QUOTES = [
     ("Talk is cheap. Show me the code.", "Linus Torvalds"),
     ("Programs must be written for people to read, and only incidentally for machines to execute.", "Harold Abelson"),
     ("Debugging is twice as hard as writing the code in the first place.", "Brian W. Kernighan"),
-    ("It's not a bug – it's an undocumented feature.", "Anonymous"),
+    ("It's not a bug - it's an undocumented feature.", "Anonymous"),
     ("The best error message is the one that never shows up.", "Thomas Fuchs"),
     ("Real programmers count from 0.", "Anonymous"),
     ("Every great developer you know got there by solving problems they were unqualified to solve until they did it.", "Patrick McKenzie"),
@@ -44,21 +45,29 @@ quote_text, quote_author = random.choice(QUOTES)
 entry = f"""
 ---
 
-### 📅 {date_str} — {day_str}
+### {date_str} - {day_str}
 
-**🕐 Time:** {time_str}
+**Time:** {time_str}
 
-**💬 Quote of the day:**
+**Quote of the day:**
 > "{quote_text}"
-> — *{quote_author}*
+> -- {quote_author}
 
-**✅ Status:** Daily contribution logged successfully.
+**Status:** Daily contribution logged successfully.
 """
 
-# ── Append to the log file ────────────────────────────────────────────────────
+# ── Create directory + file if they don't exist ───────────────────────────────
 LOG_PATH = "contributions/daily_log.md"
+os.makedirs("contributions", exist_ok=True)
 
+if not os.path.exists(LOG_PATH):
+    with open(LOG_PATH, "w", encoding="utf-8") as f:
+        f.write("# Daily Contribution Log\n\n")
+        f.write("Auto-updated every day via GitHub Actions.\n")
+        f.write("Each entry has the date, time, and a motivational quote.\n")
+
+# ── Append today's entry ──────────────────────────────────────────────────────
 with open(LOG_PATH, "a", encoding="utf-8") as f:
     f.write(entry)
 
-print(f"[✓] Entry added for {date_str} — "{quote_text[:40]}..."")
+print(f"[OK] Entry added for {date_str} - {quote_text[:50]}...")

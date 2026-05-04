@@ -6,6 +6,9 @@ on:
     - cron: '30 3 * * *'
   workflow_dispatch: # Allows manual trigger from GitHub UI
 
+permissions:
+  contents: write
+
 jobs:
   daily-commit:
     runs-on: ubuntu-latest
@@ -13,13 +16,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Run daily update script
         run: python scripts/update_log.py
@@ -32,5 +33,6 @@ jobs:
       - name: Commit and push changes
         run: |
           git add .
-          git commit -m "🌱 Daily contribution - $(date +'%Y-%m-%d')"
+          git diff --staged --quiet && echo "Nothing to commit" && exit 0
+          git commit -m "Daily contribution - $(date +'%Y-%m-%d')"
           git push
